@@ -13,7 +13,7 @@ using System.Runtime.InteropServices;
 
 using MetroFramework.Forms;
 
-using SCHLibFont;
+using libFont;
 
 namespace YoutubeWallpapers
 {
@@ -22,7 +22,7 @@ namespace YoutubeWallpapers
         /// <summary>
         /// 폰트 선언
         /// </summary>
-        protected SCHFont m_SCHFont = new SCHFont();
+        protected LibFont m_libFont = new LibFont();
 
         protected static Form4 m_form4;
 
@@ -30,7 +30,7 @@ namespace YoutubeWallpapers
         {
             InitializeComponent();
 
-            m_SCHFont.FontCollection();
+            m_libFont.FontCollection();
             FontSet();
         }
 
@@ -48,7 +48,7 @@ namespace YoutubeWallpapers
         /// </summary>
         protected void FontSet()
         {
-            m_SCHFont.FontSet(label_Message, 10f, FontStyle.Regular);
+            m_libFont.FontSet(label_Message, 10f, FontStyle.Regular);
         }
 
         #endregion

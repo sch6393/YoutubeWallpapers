@@ -63,6 +63,7 @@
             this.metroCheckBox_Volume = new MetroFramework.Controls.MetroCheckBox();
             this.metroButton_Next = new MetroFramework.Controls.MetroButton();
             this.metroButton_Prev = new MetroFramework.Controls.MetroButton();
+            this.metroTrackBar_Volume = new MetroFramework.Controls.MetroTrackBar();
             this.SuspendLayout();
             // 
             // metroTrackBar_Brightness
@@ -331,12 +332,13 @@
             this.label_VolumeOn.BackColor = System.Drawing.Color.Transparent;
             this.label_VolumeOn.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.label_VolumeOn.ForeColor = System.Drawing.Color.Crimson;
-            this.label_VolumeOn.Location = new System.Drawing.Point(243, 165);
+            this.label_VolumeOn.Location = new System.Drawing.Point(185, 165);
             this.label_VolumeOn.Name = "label_VolumeOn";
             this.label_VolumeOn.Size = new System.Drawing.Size(25, 15);
             this.label_VolumeOn.TabIndex = 0;
             this.label_VolumeOn.Text = "On";
             this.label_VolumeOn.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.label_VolumeOn.Visible = false;
             // 
             // label_VolumeOff
             // 
@@ -344,12 +346,13 @@
             this.label_VolumeOff.BackColor = System.Drawing.Color.Transparent;
             this.label_VolumeOff.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.label_VolumeOff.ForeColor = System.Drawing.Color.Gray;
-            this.label_VolumeOff.Location = new System.Drawing.Point(243, 165);
+            this.label_VolumeOff.Location = new System.Drawing.Point(185, 165);
             this.label_VolumeOff.Name = "label_VolumeOff";
             this.label_VolumeOff.Size = new System.Drawing.Size(27, 15);
             this.label_VolumeOff.TabIndex = 0;
             this.label_VolumeOff.Text = "Off";
             this.label_VolumeOff.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.label_VolumeOff.Visible = false;
             // 
             // metroButton_Start
             // 
@@ -499,16 +502,17 @@
             this.label_VolumeError.BackColor = System.Drawing.Color.Transparent;
             this.label_VolumeError.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.label_VolumeError.ForeColor = System.Drawing.Color.Yellow;
-            this.label_VolumeError.Location = new System.Drawing.Point(243, 165);
+            this.label_VolumeError.Location = new System.Drawing.Point(185, 165);
             this.label_VolumeError.Name = "label_VolumeError";
             this.label_VolumeError.Size = new System.Drawing.Size(37, 15);
             this.label_VolumeError.TabIndex = 0;
             this.label_VolumeError.Text = "Error";
             this.label_VolumeError.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.label_VolumeError.Visible = false;
             // 
             // metroCheckBox_Volume
             // 
-            this.metroCheckBox_Volume.Location = new System.Drawing.Point(223, 160);
+            this.metroCheckBox_Volume.Location = new System.Drawing.Point(165, 160);
             this.metroCheckBox_Volume.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.metroCheckBox_Volume.Name = "metroCheckBox_Volume";
             this.metroCheckBox_Volume.Size = new System.Drawing.Size(23, 25);
@@ -516,6 +520,7 @@
             this.metroCheckBox_Volume.TabIndex = 7;
             this.metroCheckBox_Volume.Theme = MetroFramework.MetroThemeStyle.Dark;
             this.metroCheckBox_Volume.UseSelectable = true;
+            this.metroCheckBox_Volume.Visible = false;
             this.metroCheckBox_Volume.Click += new System.EventHandler(this.metroCheckBox_Volume_Click);
             // 
             // metroButton_Next
@@ -548,10 +553,23 @@
             this.metroButton_Prev.UseSelectable = true;
             this.metroButton_Prev.Click += new System.EventHandler(this.metroButton_Prev_Click);
             // 
+            // metroTrackBar_Volume
+            // 
+            this.metroTrackBar_Volume.BackColor = System.Drawing.Color.Transparent;
+            this.metroTrackBar_Volume.Location = new System.Drawing.Point(223, 160);
+            this.metroTrackBar_Volume.Name = "metroTrackBar_Volume";
+            this.metroTrackBar_Volume.Size = new System.Drawing.Size(330, 23);
+            this.metroTrackBar_Volume.Style = MetroFramework.MetroColorStyle.Red;
+            this.metroTrackBar_Volume.TabIndex = 7;
+            this.metroTrackBar_Volume.Theme = MetroFramework.MetroThemeStyle.Dark;
+            this.metroTrackBar_Volume.Value = 100;
+            this.metroTrackBar_Volume.ValueChanged += new System.EventHandler(this.MetroTrackBar_Volume_ValueChanged);
+            // 
             // Form1
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(580, 350);
+            this.Controls.Add(this.metroTrackBar_Volume);
             this.Controls.Add(this.metroButton_Next);
             this.Controls.Add(this.metroButton_Prev);
             this.Controls.Add(this.metroCheckBox_Volume);
@@ -633,6 +651,7 @@
         private MetroFramework.Controls.MetroCheckBox metroCheckBox_Volume;
         private MetroFramework.Controls.MetroButton metroButton_Next;
         private MetroFramework.Controls.MetroButton metroButton_Prev;
+        private MetroFramework.Controls.MetroTrackBar metroTrackBar_Volume;
     }
 }
 

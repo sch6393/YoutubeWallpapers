@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 using MetroFramework.Forms;
 
-using SCHLibFont;
+using libFont;
 
 namespace YoutubeWallpapers
 {
@@ -19,13 +19,13 @@ namespace YoutubeWallpapers
         /// <summary>
         /// 폰트 선언
         /// </summary>
-        protected SCHFont m_SCHFont = new SCHFont();
+        protected LibFont m_libFont = new LibFont();
 
         public Form5()
         {
             InitializeComponent();
 
-            m_SCHFont.FontCollection();
+            m_libFont.FontCollection();
             FontSet();
 
             label6.Text = "Version " + Application.ProductVersion.Substring(0, 3);
@@ -43,14 +43,14 @@ namespace YoutubeWallpapers
         /// </summary>
         protected void FontSet()
         {
-            m_SCHFont.FontSet(label1, 10f, FontStyle.Bold);
-            m_SCHFont.FontSet(label2, 10f, FontStyle.Regular);
-            m_SCHFont.FontSet(label3, 10f, FontStyle.Bold);
-            m_SCHFont.FontSet(label4, 10f, FontStyle.Regular);
-            m_SCHFont.FontSet(label5, 10f, FontStyle.Bold);
-            m_SCHFont.FontSet(label6, 10f, FontStyle.Bold);
+            m_libFont.FontSet(label1, 10f, FontStyle.Bold);
+            m_libFont.FontSet(label2, 10f, FontStyle.Regular);
+            m_libFont.FontSet(label3, 10f, FontStyle.Bold);
+            m_libFont.FontSet(label4, 10f, FontStyle.Regular);
+            m_libFont.FontSet(label5, 10f, FontStyle.Bold);
+            m_libFont.FontSet(label6, 10f, FontStyle.Bold);
 
-            m_SCHFont.FontSet(linkLabel1, 10f, FontStyle.Regular);
+            m_libFont.FontSet(linkLabel1, 10f, FontStyle.Regular);
         }
 
         private void LinkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

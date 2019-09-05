@@ -59,6 +59,12 @@ namespace YoutubeWallpapers
             set;
         } = 0;
 
+        public int iVolume
+        {
+            get;
+            set;
+        } = 0;
+
         /// <summary>
         /// 파일에 저장
         /// </summary>
@@ -73,6 +79,7 @@ namespace YoutubeWallpapers
                 binaryWriter.Write(strNumber);
                 binaryWriter.Write(iBrightness);
                 binaryWriter.Write(iMonitor);
+                binaryWriter.Write(iVolume);
 
                 binaryWriter.Close();
             }
@@ -94,6 +101,7 @@ namespace YoutubeWallpapers
                     strNumber = binaryReader.ReadString();
                     iBrightness = binaryReader.ReadInt32();
                     iMonitor = binaryReader.ReadInt32();
+                    iVolume = binaryReader.ReadInt32();
                 }
                 catch
                 {

@@ -9,24 +9,63 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.InteropServices;
-using System.Threading;
 using Microsoft.Win32;
 
-using SCHLibWallpaper;
+using libWallpaper;
+
+using CefSharp;
+using CefSharp.WinForms;
 
 namespace YoutubeWallpapers
 {
+    /// <summary>
+    /// 기본 웹브라우저를 쓰면 인터넷 속도가 잘 나옴에도 불구하고 자동으로 화질을 떨어뜨리는 문제가 발생해서 CefSharp로 변경함
+    /// </summary>
     public partial class Form2 : Form
     {
+        [DllImport("winmm.dll")]
+        public static extern int waveOutGetVolume(IntPtr h, out uint dwVolume);
+
+        [DllImport("winmm.dll")]
+        public static extern int waveOutSetVolume(IntPtr h, uint dwVolume);
+
         /// <summary>
         /// Background 변수들
         /// </summary>
         private bool m_bFixed = false;
         private int m_iMonitor = 0;
 
+        /// <summary>
+        /// CefSharp
+        /// </summary>
+        protected ChromiumWebBrowser m_chromiumWebBrowser;
+
+        /// <summary>
+        /// 볼륨 값
+        /// </summary>
+        public static int iVolume
+        {
+            get
+            {
+                uint uitmp = 0;
+
+                waveOutGetVolume(IntPtr.Zero, out uitmp);
+
+                return (int)((double)(uitmp & 0xFFFF) * 100 / 0xFFFF);
+            }
+            set
+            {
+                uint uitmp = (uint)((double)0xFFFF * value / 100) & 0xFFFF;
+
+                waveOutSetVolume(IntPtr.Zero, (uitmp << 16) | uitmp);
+            }
+        }
+
         public Form2()
         {
+            // CefSharp로 변경해서 사용하지 않음
             // 웹브라우저 컨트롤 생성 전에 등록
             // SetBrowserFeatureControl();
 
@@ -35,6 +74,8 @@ namespace YoutubeWallpapers
             Monitor = m_iMonitor;
 
             Background();
+
+            CefSharpBrowser();
         }
 
         private void Form2_Load(object sender, EventArgs e)
@@ -45,7 +86,32 @@ namespace YoutubeWallpapers
 
         private void Form2_FormClosed(object sender, FormClosedEventArgs e)
         {
+            Cef.Shutdown();
+        }
 
+        /// <summary>
+        /// CefSharp Browser
+        /// </summary>
+        protected void CefSharpBrowser()
+        {
+            CultureInfo cultureInfo = CultureInfo.InstalledUICulture;
+
+            CefSettings cefSettings = new CefSettings();
+
+            // 소리
+            // cefSettings.CefCommandLineArgs.Add("mute-audio", "true");
+
+            // 자동 실행 정책
+            cefSettings.CefCommandLineArgs["autoplay-policy"] = "no-user-gesture-required";
+
+            // 지역 설정
+            cefSettings.Locale = cultureInfo.TwoLetterISOLanguageName; // cultureInfo.ThreeLetterISOLanguageName;
+
+            Cef.Initialize(cefSettings);
+
+            m_chromiumWebBrowser = new ChromiumWebBrowser("about:blank");
+            m_chromiumWebBrowser.Dock = DockStyle.Fill;
+            Controls.Add(m_chromiumWebBrowser);
         }
 
         /// <summary>
@@ -53,7 +119,9 @@ namespace YoutubeWallpapers
         /// </summary>
         public void BrowserURL(string url)
         {
-            webBrowser.Navigate(url);
+            m_chromiumWebBrowser.Load(url);
+
+            // webBrowser.Navigate(url);
         }
 
         /// <summary>
@@ -61,7 +129,9 @@ namespace YoutubeWallpapers
         /// </summary>
         public void Stop()
         {
-            webBrowser.Navigate("about:blank");
+            m_chromiumWebBrowser.Load("about:blank");
+
+            // webBrowser.Navigate("about:blank");
         }
 
         #region Background
@@ -129,7 +199,7 @@ namespace YoutubeWallpapers
 
         #endregion
 
-        #region IE Feature Control
+        #region IE Feature Control (CefSharp로 변경해서 미사용)
 
         // https://stackoverflow.com/questions/18333459/c-sharp-webbrowser-ajax-call
 

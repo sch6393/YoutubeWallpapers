@@ -40,6 +40,7 @@
             this.webBrowser.Name = "webBrowser";
             this.webBrowser.Size = new System.Drawing.Size(800, 450);
             this.webBrowser.TabIndex = 0;
+            this.webBrowser.Visible = false;
             // 
             // Form2
             // 

@@ -15,7 +15,7 @@ using Microsoft.Win32;
 
 using MetroFramework.Forms;
 
-using SCHLibFont;
+using libFont;
 
 namespace YoutubeWallpapers
 {
@@ -31,7 +31,7 @@ namespace YoutubeWallpapers
         /// <summary>
         /// 폰트 선언
         /// </summary>
-        protected SCHFont m_SCHFont = new SCHFont();
+        protected LibFont m_libFont = new LibFont();
 
         /// <summary>
         /// Setting 선언
@@ -61,6 +61,11 @@ namespace YoutubeWallpapers
         public static int m_iBrightness = 50;
 
         /// <summary>
+        /// 볼륨 값
+        /// </summary>
+        protected int m_iVolume = 0;
+
+        /// <summary>
         /// Background 변수들
         /// (각 폼에서 개별적으로 선언)
         /// </summary>
@@ -88,7 +93,7 @@ namespace YoutubeWallpapers
 
             #endregion
 
-            m_SCHFont.FontCollection();
+            m_libFont.FontCollection();
             FontSet();
         }
 
@@ -110,8 +115,8 @@ namespace YoutubeWallpapers
             // 밝기 조절
             SetBrightness(m_iBrightness);
 
-            // 볼륨 상태 표시
-            GetVolume();
+            // 볼륨 상태 표시 (CefSharp로 변경해서 미사용)
+            // GetVolume();
 
             // 모니터 출력
             if (m_setting.iMonitor != 0)
@@ -221,27 +226,27 @@ namespace YoutubeWallpapers
         /// </summary>
         protected void FontSet()
         {
-            m_SCHFont.FontSet(label_Help, 10f, FontStyle.Regular);
-            m_SCHFont.FontSet(label_Address, 10f, FontStyle.Regular);
-            m_SCHFont.FontSet(label_Type, 10f, FontStyle.Regular);
-            m_SCHFont.FontSet(label_TypeList, 10f, FontStyle.Regular);
-            m_SCHFont.FontSet(label_TypeSingle, 10f, FontStyle.Regular);
-            m_SCHFont.FontSet(label_VQ, 10f, FontStyle.Regular);
-            m_SCHFont.FontSet(label_Volume, 10f, FontStyle.Regular);
-            m_SCHFont.FontSet(label_VolumeOn, 10f, FontStyle.Regular);
-            m_SCHFont.FontSet(label_VolumeOff, 10f, FontStyle.Regular);
-            m_SCHFont.FontSet(label_VolumeError, 10f, FontStyle.Regular);
-            m_SCHFont.FontSet(label_Brightness, 10f, FontStyle.Regular);
-            m_SCHFont.FontSet(label_Buttons, 10f, FontStyle.Regular);
-            m_SCHFont.FontSet(label_Monitor, 10f, FontStyle.Regular);
-            m_SCHFont.FontSet(label_StartupProgram, 10f, FontStyle.Regular);
-            m_SCHFont.FontSet(label_StartOn, 10f, FontStyle.Regular);
-            m_SCHFont.FontSet(label_StartOff, 10f, FontStyle.Regular);
-            m_SCHFont.FontSet(label_Help, 10f, FontStyle.Regular);
-            m_SCHFont.FontSet(label_Help, 10f, FontStyle.Regular);
+            m_libFont.FontSet(label_Help, 10f, FontStyle.Regular);
+            m_libFont.FontSet(label_Address, 10f, FontStyle.Regular);
+            m_libFont.FontSet(label_Type, 10f, FontStyle.Regular);
+            m_libFont.FontSet(label_TypeList, 10f, FontStyle.Regular);
+            m_libFont.FontSet(label_TypeSingle, 10f, FontStyle.Regular);
+            m_libFont.FontSet(label_VQ, 10f, FontStyle.Regular);
+            m_libFont.FontSet(label_Volume, 10f, FontStyle.Regular);
+            m_libFont.FontSet(label_VolumeOn, 10f, FontStyle.Regular);
+            m_libFont.FontSet(label_VolumeOff, 10f, FontStyle.Regular);
+            m_libFont.FontSet(label_VolumeError, 10f, FontStyle.Regular);
+            m_libFont.FontSet(label_Brightness, 10f, FontStyle.Regular);
+            m_libFont.FontSet(label_Buttons, 10f, FontStyle.Regular);
+            m_libFont.FontSet(label_Monitor, 10f, FontStyle.Regular);
+            m_libFont.FontSet(label_StartupProgram, 10f, FontStyle.Regular);
+            m_libFont.FontSet(label_StartOn, 10f, FontStyle.Regular);
+            m_libFont.FontSet(label_StartOff, 10f, FontStyle.Regular);
+            m_libFont.FontSet(label_Help, 10f, FontStyle.Regular);
+            m_libFont.FontSet(label_Help, 10f, FontStyle.Regular);
 
-            m_SCHFont.FontSet(metroTextBox_Address, 10f, FontStyle.Regular);
-            m_SCHFont.FontSet(metroTextBox_Number, 10f, FontStyle.Regular);
+            m_libFont.FontSet(metroTextBox_Address, 10f, FontStyle.Regular);
+            m_libFont.FontSet(metroTextBox_Number, 10f, FontStyle.Regular);
         }
 
         #endregion
@@ -295,6 +300,7 @@ namespace YoutubeWallpapers
             m_setting.strAddress = metroTextBox_Address.Text;
             m_setting.strNumber = metroTextBox_Number.Text;
             m_setting.iBrightness = metroTrackBar_Brightness.Value;
+            m_setting.iVolume = metroTrackBar_Volume.Value;
 
             m_setting.SaveToFile(m_strSettingFile);
         }
@@ -347,6 +353,9 @@ namespace YoutubeWallpapers
 
             m_iBrightness = m_setting.iBrightness;
             metroTrackBar_Brightness.Value = m_setting.iBrightness;
+
+            m_iVolume = m_setting.iVolume;
+            metroTrackBar_Volume.Value = m_setting.iVolume;
         }
 
         #endregion
@@ -426,6 +435,11 @@ namespace YoutubeWallpapers
             g_program.m_form2.BrowserURL(stringBuilder.ToString());
         }
 
+        /// <summary>
+        /// 파라미터
+        /// </summary>
+        /// <param name="bFlag"></param>
+        /// <param name="stringBuilder"></param>
         protected void Parameter(bool bFlag, StringBuilder stringBuilder)
         {
             if (!m_bCheck)
@@ -594,7 +608,7 @@ namespace YoutubeWallpapers
         }
 
         /// <summary>
-        /// Get Volume
+        /// Get Volume (CefSharp로 변경해서 미사용)
         /// </summary>
         protected void GetVolume()
         {
@@ -637,7 +651,7 @@ namespace YoutubeWallpapers
         }
 
         /// <summary>
-        /// Set Volume
+        /// Set Volume (CefSharp로 변경해서 미사용)
         /// </summary>
         /// <param name="bFlag"></param>
         protected void SetVolume(bool bFlag)
@@ -725,8 +739,13 @@ namespace YoutubeWallpapers
             m_setting.SaveToFile(m_strSettingFile);
         }
 
+        private void MetroTrackBar_Volume_ValueChanged(object sender, EventArgs e)
+        {
+            Form2.iVolume = metroTrackBar_Volume.Value;
 
-
+            m_setting.iVolume = metroTrackBar_Volume.Value;
+            m_setting.SaveToFile(m_strSettingFile);
+        }
 
         #endregion
 
@@ -759,7 +778,7 @@ namespace YoutubeWallpapers
         }
 
         /// <summary>
-        /// 볼륨 설정
+        /// 볼륨 설정 (CefSharp로 변경해서 미사용)
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -767,17 +786,17 @@ namespace YoutubeWallpapers
         {
             if (label_VolumeOn.Visible)
             {
-                SetVolume(false);
+                // SetVolume(false);
             }
             else if (label_VolumeOff.Visible)
             {
-                SetVolume(true);
+                // SetVolume(true);
             }
 
-            Form4.DialogCustom("Volume Setup is Complete!", "Restart Program!");
+            // Form4.DialogCustom("Volume Setup is Complete!", "Restart Program!");
 
             // 재시작을 해야 볼륨 설정이 적용
-            Application.Restart();
+            // Application.Restart();
         }
 
         #endregion
