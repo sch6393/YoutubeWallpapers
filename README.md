@@ -3,6 +3,7 @@
 # YoutubeWallpapers
 YoutubeWallpapers
 - 1.0 : 최초 업로드
+- 1.1 : 웹브라우저 문제로 인해 CefSharp로 변경
 
 ****
 
