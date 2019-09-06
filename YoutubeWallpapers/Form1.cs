@@ -109,9 +109,6 @@ namespace YoutubeWallpapers
             // 아이콘 생성
             m_NotifyIcon.Visible = true;
 
-            // 밝기 값
-            m_iBrightness = m_setting.iBrightness;
-
             // 밝기 조절
             SetBrightness(m_iBrightness);
 
@@ -158,6 +155,11 @@ namespace YoutubeWallpapers
             }
 
             Play();
+        }
+
+        private void Form1_Shown(object sender, EventArgs e)
+        {
+
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)

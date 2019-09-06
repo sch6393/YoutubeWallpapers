@@ -28,7 +28,7 @@ namespace YoutubeWallpapers
             m_libFont.FontCollection();
             FontSet();
 
-            label6.Text = "Version " + Application.ProductVersion.Substring(0, 3);
+            label6.Text = "Version " + Application.ProductVersion.Substring(0, 3) + ".1";
         }
 
         private void Form5_FormClosed(object sender, FormClosedEventArgs e)
