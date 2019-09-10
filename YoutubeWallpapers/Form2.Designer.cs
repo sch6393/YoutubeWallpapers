@@ -28,13 +28,31 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form2));
+            this.m_timer = new System.Windows.Forms.Timer(this.components);
+            this.webBrowser = new System.Windows.Forms.WebBrowser();
             this.SuspendLayout();
+            // 
+            // m_timer
+            // 
+            this.m_timer.Interval = 2000;
+            this.m_timer.Tick += new System.EventHandler(this.M_timer_Tick);
+            // 
+            // webBrowser
+            // 
+            this.webBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.webBrowser.Location = new System.Drawing.Point(0, 0);
+            this.webBrowser.MinimumSize = new System.Drawing.Size(20, 20);
+            this.webBrowser.Name = "webBrowser";
+            this.webBrowser.Size = new System.Drawing.Size(800, 450);
+            this.webBrowser.TabIndex = 0;
             // 
             // Form2
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.webBrowser);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
@@ -50,5 +68,8 @@
         }
 
         #endregion
+
+        private System.Windows.Forms.Timer m_timer;
+        private System.Windows.Forms.WebBrowser webBrowser;
     }
 }

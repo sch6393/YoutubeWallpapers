@@ -43,11 +43,11 @@ namespace YoutubeWallpapers
 
             m_form2.Show();
 
+            // CefSharp와 WebBrowser 모두 사용하면서 Form 위치 순서를 재변경 -> Form2 주석 참고
+            m_form1.Show();
+
             // Form3가 밝기 조절 폼이므로 맨 마지막에 실행되어야 함
             m_form3.Show();
-
-            // CefSharp로 변경하면서 Form3가 Form2 위로 올라오지 않는 현상을 방지하기 위해 Form1을 맨 마지막에 실행되도록 변경
-            m_form1.Show();
         }
 
         #region .Net Version Check

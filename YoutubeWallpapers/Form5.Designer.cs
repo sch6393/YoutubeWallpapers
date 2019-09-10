@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form5));
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             this.label5 = new System.Windows.Forms.Label();
@@ -36,6 +37,8 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
+            this.m_metroStyleManager = new MetroFramework.Components.MetroStyleManager(this.components);
+            ((System.ComponentModel.ISupportInitialize)(this.m_metroStyleManager)).BeginInit();
             this.SuspendLayout();
             // 
             // linkLabel1
@@ -43,7 +46,7 @@
             this.linkLabel1.AutoSize = true;
             this.linkLabel1.Font = new System.Drawing.Font("나눔바른고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.linkLabel1.LinkColor = System.Drawing.Color.DeepSkyBlue;
-            this.linkLabel1.Location = new System.Drawing.Point(23, 290);
+            this.linkLabel1.Location = new System.Drawing.Point(23, 305);
             this.linkLabel1.Name = "linkLabel1";
             this.linkLabel1.Size = new System.Drawing.Size(221, 15);
             this.linkLabel1.TabIndex = 0;
@@ -57,7 +60,7 @@
             this.label5.BackColor = System.Drawing.Color.Transparent;
             this.label5.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.label5.ForeColor = System.Drawing.Color.White;
-            this.label5.Location = new System.Drawing.Point(23, 270);
+            this.label5.Location = new System.Drawing.Point(23, 285);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(86, 15);
             this.label5.TabIndex = 0;
@@ -71,7 +74,7 @@
             this.label3.ForeColor = System.Drawing.Color.White;
             this.label3.Location = new System.Drawing.Point(23, 135);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(134, 15);
+            this.label3.Size = new System.Drawing.Size(55, 15);
             this.label3.TabIndex = 0;
             this.label3.Text = "Caution";
             // 
@@ -108,7 +111,7 @@
             this.label4.ForeColor = System.Drawing.Color.White;
             this.label4.Location = new System.Drawing.Point(23, 155);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(441, 90);
+            this.label4.Size = new System.Drawing.Size(533, 105);
             this.label4.TabIndex = 0;
             this.label4.Text = resources.GetString("label4.Text");
             // 
@@ -118,16 +121,21 @@
             this.label6.BackColor = System.Drawing.Color.Transparent;
             this.label6.Font = new System.Drawing.Font("나눔고딕", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.label6.ForeColor = System.Drawing.Color.White;
-            this.label6.Location = new System.Drawing.Point(700, 300);
+            this.label6.Location = new System.Drawing.Point(570, 315);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(77, 15);
             this.label6.TabIndex = 0;
             this.label6.Text = "Version 1.0";
             // 
+            // m_metroStyleManager
+            // 
+            this.m_metroStyleManager.Owner = null;
+            this.m_metroStyleManager.Style = MetroFramework.MetroColorStyle.Red;
+            // 
             // Form5
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.ClientSize = new System.Drawing.Size(800, 335);
+            this.ClientSize = new System.Drawing.Size(670, 350);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.linkLabel1);
@@ -145,6 +153,7 @@
             this.Text = "Help";
             this.Theme = MetroFramework.MetroThemeStyle.Dark;
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form5_FormClosed);
+            ((System.ComponentModel.ISupportInitialize)(this.m_metroStyleManager)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -159,5 +168,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label6;
+        private MetroFramework.Components.MetroStyleManager m_metroStyleManager;
     }
 }

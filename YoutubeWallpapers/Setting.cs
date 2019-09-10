@@ -65,6 +65,18 @@ namespace YoutubeWallpapers
             set;
         } = 0;
 
+        public bool bStyle
+        {
+            get;
+            set;
+        } = false;
+
+        public bool bH264
+        {
+            get;
+            set;
+        } = false;
+
         /// <summary>
         /// 파일에 저장
         /// </summary>
@@ -80,6 +92,8 @@ namespace YoutubeWallpapers
                 binaryWriter.Write(iBrightness);
                 binaryWriter.Write(iMonitor);
                 binaryWriter.Write(iVolume);
+                binaryWriter.Write(bStyle);
+                binaryWriter.Write(bH264);
 
                 binaryWriter.Close();
             }
@@ -102,6 +116,8 @@ namespace YoutubeWallpapers
                     iBrightness = binaryReader.ReadInt32();
                     iMonitor = binaryReader.ReadInt32();
                     iVolume = binaryReader.ReadInt32();
+                    bStyle = binaryReader.ReadBoolean();
+                    bH264 = binaryReader.ReadBoolean();
                 }
                 catch
                 {

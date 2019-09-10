@@ -21,7 +21,17 @@ using CefSharp.WinForms;
 namespace YoutubeWallpapers
 {
     /// <summary>
-    /// 기본 웹브라우저를 쓰면 인터넷 속도가 잘 나옴에도 불구하고 자동으로 화질을 떨어뜨리는 문제가 발생해서 CefSharp로 변경함
+    /// v1.1 : 기본 웹브라우저를 쓰면 인터넷 속도가 잘 나옴에도 불구하고 자동으로 화질을 떨어뜨리는 문제가 발생해서 CefSharp로 변경함
+    /// v1.2 : CefSharp를 사용하면 H.264 코덱이 미포함되어있어 해당 코덱 영상이나 스트리밍 영상이 재생되지 않는 문제가 발생
+    ///        WebBrowser는 H.264 코덱에 영향을 받지 않으므로 따로 체크 옵션을 두어 해당 코덱 영상이나 스트리밍 영상을 재생할 때는 WebBrowser를 이용
+    ///        CefSharp, WebBrowser 따로 작동시키려니 로직상 미리 정의해놓은 CefSharp로 인해 프로그램 종료가 제대로 되지 않는 문제가 발생함 -> 추후 방법 모색
+    ///        일단 조치사항으로 H.264가 체크되어 있지 않다면 CefSharp만 사용
+    ///        체크되있을 때는 브라우저 2개를 동시에 사용하고 CefSharp는 Unvisible 상태에 볼륨 값을 0으로 변경
+    ///        어차피 H.264 코덱 영상이나 스트리밍 영상은 CefSharp에선 정상 작동하지 않으므로 인터넷 속도에 영향은 없음
+    ///        다만 체크된 상태에서 H.264 코덱 영상이나 스트리밍 영상이 아닌 다른 영상을 재생할 경우 CefSharp에서도 정상 작동되므로 인터넷 속도에 주의할 필요가 있음
+    ///        v1.1에서 발생했던 WebBrowser의 화질 저하 문제는 익스플로러 버전 값을 11001로 설정하면 해결됨
+    ///        (인터넷 속도에 문제가 없고 처음에 설정한 화질이 나오더라도 동영상이 진행될 수록 화질을 한 단계씩 계속 내리는 현상)
+    ///        하지만 11001로 설정한 이후 화질이 한 단계씩 계속 내려가는 현상은 없어졌으나 처음 설정한 화질이 설정되지 못하는 현상이 가끔 발생함 -> 추후 방법 모색
     /// </summary>
     public partial class Form2 : Form
     {
@@ -65,9 +75,9 @@ namespace YoutubeWallpapers
 
         public Form2()
         {
-            // CefSharp로 변경해서 사용하지 않음
+            // CefSharp로 변경해서 사용하지 않음 -> 다시 사용 (Form2 주석 참고)
             // 웹브라우저 컨트롤 생성 전에 등록
-            // SetBrowserFeatureControl();
+            SetBrowserFeatureControl();
 
             InitializeComponent();
 
@@ -86,6 +96,11 @@ namespace YoutubeWallpapers
 
         private void Form2_FormClosed(object sender, FormClosedEventArgs e)
         {
+            if (!Form1.m_bH264)
+            {
+                m_timer.Stop();
+            }                
+
             Cef.Shutdown();
         }
 
@@ -111,17 +126,27 @@ namespace YoutubeWallpapers
 
             m_chromiumWebBrowser = new ChromiumWebBrowser("about:blank");
             m_chromiumWebBrowser.Dock = DockStyle.Fill;
+            m_chromiumWebBrowser.FrameLoadEnd += M_chromiumWebBrowser_FrameLoadEnd;
             Controls.Add(m_chromiumWebBrowser);
         }
 
         /// <summary>
         /// WebBrowser Start
         /// </summary>
+        /// <param name="url"></param>
         public void BrowserURL(string url)
         {
-            m_chromiumWebBrowser.Load(url);
+            webBrowser.Visible = Form1.m_bH264;
+            m_chromiumWebBrowser.Visible = !Form1.m_bH264;
 
-            // webBrowser.Navigate(url);
+            if (Form1.m_bH264)
+            {
+                webBrowser.Navigate(url);
+
+                iVolume = 0;
+            }
+
+            m_chromiumWebBrowser.Load(url);
         }
 
         /// <summary>
@@ -129,9 +154,62 @@ namespace YoutubeWallpapers
         /// </summary>
         public void Stop()
         {
-            m_chromiumWebBrowser.Load("about:blank");
+            if (Form1.m_bH264)
+            {
+                webBrowser.Navigate("");
+                m_chromiumWebBrowser.Load("about:blank");
+            }
+            else
+            {
+                m_chromiumWebBrowser.Load("about:blank");
+            }
+        }
 
-            // webBrowser.Navigate("about:blank");
+        /// <summary>
+        /// 브라우저 로딩이 끝난 후 (CefSharp)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void M_chromiumWebBrowser_FrameLoadEnd(object sender, FrameLoadEndEventArgs e)
+        {
+            if (e.Frame.IsMain)
+            {
+                // m_chromiumWebBrowser.ViewSource();
+                m_chromiumWebBrowser.GetSourceAsync().ContinueWith(taskHtml =>
+                {
+                    Form1.m_strHtml = taskHtml.Result;
+                });
+
+                m_timer.Start();
+            }
+        }
+
+        /// <summary>
+        /// 정주기 (2초)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            HtmlSource();
+        }
+
+        /// <summary>
+        /// Html Source
+        /// </summary>
+        protected void HtmlSource()
+        {
+            // WebBrowser의 경우 Html Source가 동적으로 읽어지지 않음
+            // 어차피 CefSharp 동시 실행이므로 관계 없음 -> Form2 주석 참고
+            m_chromiumWebBrowser.GetSourceAsync().ContinueWith(taskHtml =>
+            {
+                Form1.m_strHtml = taskHtml.Result;
+            });
+
+            if (Form1.m_bCheck)
+            {
+                m_timer.Stop();
+            }
         }
 
         #region Background
@@ -199,7 +277,7 @@ namespace YoutubeWallpapers
 
         #endregion
 
-        #region IE Feature Control (CefSharp로 변경해서 미사용)
+        #region IE Feature Control (CefSharp로 변경해서 미사용) -> 다시 사용 (Form2 주석 참고)
 
         // https://stackoverflow.com/questions/18333459/c-sharp-webbrowser-ajax-call
 
@@ -253,7 +331,7 @@ namespace YoutubeWallpapers
 
         private uint GetBrowserEmulationMode()
         {
-            int browserVersion = 7;
+            int browserVersion = 11;
 
             using (var ieKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Internet Explorer",
                 RegistryKeyPermissionCheck.ReadSubTree,
@@ -299,7 +377,8 @@ namespace YoutubeWallpapers
 
                 // 11000 : Internet Explorer 11. Webpages containing standards-based !DOCTYPE directives are displayed in IE11 Standards mode. Default value for Internet Explorer 11.
                 case 11:
-                    mode = 11000;
+                    // mode = 11000;
+                    mode = 11001;
                     break;
 
                 default:

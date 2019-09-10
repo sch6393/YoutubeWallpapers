@@ -9,10 +9,13 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using System.IO;
+using System.Net;
 using System.Security.Principal;
 using System.Threading;
 using Microsoft.Win32;
 
+using MetroFramework;
+using MetroFramework.Controls;
 using MetroFramework.Forms;
 
 using libFont;
@@ -41,11 +44,6 @@ namespace YoutubeWallpapers
         protected Setting m_setting = new Setting();
 
         /// <summary>
-        /// Form2가 필요로 하는 데이터 변수 (Youtube 변환 주소)
-        /// </summary>
-        public static string m_strConvertAddress = "";
-
-        /// <summary>
         /// Youtube Address & ID
         /// </summary>
         protected string m_strAddress = "";
@@ -53,17 +51,17 @@ namespace YoutubeWallpapers
         /// <summary>
         /// true면 단일, false면 리스트
         /// </summary>
-        protected bool m_bCheck;
+        public static bool m_bCheck;
 
         /// <summary>
         /// 밝기 값
         /// </summary>
-        public static int m_iBrightness = 50;
+        protected int m_iBrightness = 50;
 
         /// <summary>
         /// 볼륨 값
         /// </summary>
-        protected int m_iVolume = 0;
+        // protected int m_iVolume = 0;
 
         /// <summary>
         /// Background 변수들
@@ -71,6 +69,52 @@ namespace YoutubeWallpapers
         /// </summary>
         // public static bool m_bFixed = false;
         // public static int  m_iMonitor = 0;
+
+        /// <summary>
+        /// Style Mode
+        /// false : Light, true : Dark
+        /// </summary>
+        public static bool m_bStyle = false;
+
+        /// <summary>
+        /// Html Source
+        /// </summary>
+        public static string m_strHtml = "";
+
+        /// <summary>
+        /// Youtube Video Name
+        /// </summary>
+        protected string m_strNameOld = "";
+        protected string m_strNameNew = "";
+
+        /// <summary>
+        /// Playlist Number
+        /// </summary>
+        protected int m_iPlaylistNumber;
+
+        /// <summary>
+        /// Prev, Next 구분
+        /// 0 : 초기화, 1 : Prev, 2 : Next, 3 : 기본 값
+        /// </summary>
+        protected int m_iPrevNext = 0;
+
+        /// <summary>
+        /// H264 Flag
+        /// false : CefSharp, true : WebBrowser
+        /// </summary>
+        public static bool m_bH264 = false;
+
+        /// <summary>
+        /// 투명 라벨
+        /// </summary>
+        protected TransparentLabel m_transparentLabel = new TransparentLabel();
+        // protected TransparentLabelTop m_transparentLabelTop = new TransparentLabelTop();
+
+        /// <summary>
+        /// true : 증가, false : 감소
+        /// </summary>
+        protected bool m_bTransparent = false;
+        public static int m_iTransparent = 255;
 
         /// <summary>
         /// 생성자
@@ -95,6 +139,9 @@ namespace YoutubeWallpapers
 
             m_libFont.FontCollection();
             FontSet();
+
+            // StyleManager
+            StyleManager = m_metroStyleManager;
         }
 
         /// <summary>
@@ -105,15 +152,6 @@ namespace YoutubeWallpapers
         private void Form1_Load(object sender, EventArgs e)
         {
             LoadSetting();
-
-            // 아이콘 생성
-            m_NotifyIcon.Visible = true;
-
-            // 밝기 조절
-            SetBrightness(m_iBrightness);
-
-            // 볼륨 상태 표시 (CefSharp로 변경해서 미사용)
-            // GetVolume();
 
             // 모니터 출력
             if (m_setting.iMonitor != 0)
@@ -157,20 +195,35 @@ namespace YoutubeWallpapers
             Play();
         }
 
+        /// <summary>
+        /// 폼 로딩이 끝난 후
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Form1_Shown(object sender, EventArgs e)
         {
-
+            VersionCheck();
         }
 
+        /// <summary>
+        /// 폼 종료 시
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
-            // 메모리, 리소스 해제 및 메세지 처리 후 종료
-            g_program.ExitThread();
-
-            Dispose();
-            Application.Exit();
+            ProgramExit();
         }
 
+        /// <summary>
+        /// 정주기 (2초)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            Parsing();
+        }
 
         #region Event Handler
 
@@ -245,10 +298,19 @@ namespace YoutubeWallpapers
             m_libFont.FontSet(label_StartOn, 10f, FontStyle.Regular);
             m_libFont.FontSet(label_StartOff, 10f, FontStyle.Regular);
             m_libFont.FontSet(label_Help, 10f, FontStyle.Regular);
-            m_libFont.FontSet(label_Help, 10f, FontStyle.Regular);
+            m_libFont.FontSet(label_StyleMode, 10f, FontStyle.Regular);
 
             m_libFont.FontSet(metroTextBox_Address, 10f, FontStyle.Regular);
             m_libFont.FontSet(metroTextBox_Number, 10f, FontStyle.Regular);
+
+            m_libFont.FontSet(m_metroContextMenu, 10f, FontStyle.Regular);
+
+            m_libFont.FontSet(label_H264, 10f, FontStyle.Regular);
+            m_libFont.FontSet(label_H264On, 10f, FontStyle.Regular);
+            m_libFont.FontSet(label_H264Off, 10f, FontStyle.Regular);
+
+            m_libFont.FontSet(label_Name, 10f, FontStyle.Regular);
+            m_libFont.FontSet(label_VideoName, 10f, FontStyle.Regular);
         }
 
         #endregion
@@ -303,6 +365,8 @@ namespace YoutubeWallpapers
             m_setting.strNumber = metroTextBox_Number.Text;
             m_setting.iBrightness = metroTrackBar_Brightness.Value;
             m_setting.iVolume = metroTrackBar_Volume.Value;
+            m_setting.bStyle = m_bStyle;
+            m_setting.bH264 = m_bH264;
 
             m_setting.SaveToFile(m_strSettingFile);
         }
@@ -333,18 +397,22 @@ namespace YoutubeWallpapers
             {
                 case Setting.VideoQuality.Auto:
                     metroRadioButton_Auto.Checked = true;
+                    autoToolStripMenuItem.Checked = true;
                     break;
 
                 case Setting.VideoQuality.P720:
                     metroRadioButton_720.Checked = true;
+                    video720ToolStripMenuItem.Checked = true;
                     break;
 
                 case Setting.VideoQuality.P1080:
                     metroRadioButton_1080.Checked = true;
+                    video1080ToolStripMenuItem.Checked = true;
                     break;
 
                 case Setting.VideoQuality.P1440:
                     metroRadioButton_1440.Checked = true;
+                    video1440ToolStripMenuItem.Checked = true;
                     break;
             }
 
@@ -352,12 +420,47 @@ namespace YoutubeWallpapers
             metroTextBox_Address.Text = m_strAddress;
 
             metroTextBox_Number.Text = m_setting.strNumber;
+            m_iPlaylistNumber = int.Parse(m_setting.strNumber);
 
             m_iBrightness = m_setting.iBrightness;
             metroTrackBar_Brightness.Value = m_setting.iBrightness;
 
-            m_iVolume = m_setting.iVolume;
+            Form2.iVolume = m_setting.iVolume;
             metroTrackBar_Volume.Value = m_setting.iVolume;
+
+            m_bStyle = m_setting.bStyle;
+
+            m_bH264 = m_setting.bH264;
+
+            // 아이콘 생성
+            m_NotifyIcon.Visible = true;
+
+            // 밝기 조절
+            SetBrightness(m_iBrightness);
+
+            // 볼륨 상태 표시 (CefSharp로 변경해서 미사용)
+            // GetVolume();
+
+            // Style Mode
+            StyleMode();
+
+            if (m_bH264)
+            {
+                label_H264On.Visible = true;
+                label_VolumeError.Visible = true;
+                label_VolumeOff.Visible = true;
+                label_VolumeOn.Visible = true;
+                metroCheckBox_Volume.Visible = true;
+                metroCheckBox_H264.Checked = true;
+
+                GetVolume();
+            }
+            else
+            {
+                label_H264Off.Visible = true;
+                metroTrackBar_Volume.Visible = true;
+                metroCheckBox_H264.Checked = false;
+            }
         }
 
         #endregion
@@ -388,6 +491,8 @@ namespace YoutubeWallpapers
                 metroTextBox_Number.Visible = true;
                 metroButton_Prev.Enabled = true;
                 metroButton_Next.Enabled = true;
+                prevToolStripMenuItem.Enabled = true;
+                nextToolStripMenuItem.Enabled = true;
 
                 stringBuilder.Append(@"embed?listType=playlist&list=");
 
@@ -400,8 +505,22 @@ namespace YoutubeWallpapers
                 if (!string.IsNullOrEmpty(strNum))
                 {
                     int itmp = Convert.ToInt32(strNum);
+                    m_iPlaylistNumber = itmp;
 
                     stringBuilder.Append("&index=");
+
+                    if (m_iPrevNext == 1)
+                    {
+                        itmp--;
+                    }
+                    else if (m_iPrevNext == 2)
+                    {
+                        itmp++;
+                    }
+                    else
+                    {
+
+                    }
 
                     stringBuilder.Append(itmp - 1);
                 }
@@ -414,6 +533,8 @@ namespace YoutubeWallpapers
                 metroTextBox_Number.Visible = false;
                 metroButton_Prev.Enabled = false;
                 metroButton_Next.Enabled = false;
+                prevToolStripMenuItem.Enabled = false;
+                nextToolStripMenuItem.Enabled = false;
 
                 stringBuilder.Append(@"embed/");
 
@@ -435,6 +556,8 @@ namespace YoutubeWallpapers
             // stringBuilder.Append("&end=10");
 
             g_program.m_form2.BrowserURL(stringBuilder.ToString());
+
+            m_timer.Start();
         }
 
         /// <summary>
@@ -521,6 +644,8 @@ namespace YoutubeWallpapers
         /// </summary>
         protected void Stop()
         {
+            m_timer.Stop();
+
             g_program.m_form2.Stop();
         }
 
@@ -610,7 +735,7 @@ namespace YoutubeWallpapers
         }
 
         /// <summary>
-        /// Get Volume (CefSharp로 변경해서 미사용)
+        /// Get Volume (CefSharp로 변경해서 미사용) -> 다시 사용 (Form2 주석 참고)
         /// </summary>
         protected void GetVolume()
         {
@@ -653,7 +778,7 @@ namespace YoutubeWallpapers
         }
 
         /// <summary>
-        /// Set Volume (CefSharp로 변경해서 미사용)
+        /// Set Volume (CefSharp로 변경해서 미사용) -> 다시 사용 (Form2 주석 참고)
         /// </summary>
         /// <param name="bFlag"></param>
         protected void SetVolume(bool bFlag)
@@ -697,6 +822,377 @@ namespace YoutubeWallpapers
             Activate();
         }
 
+        /// <summary>
+        /// 프로그램 종료
+        /// </summary>
+        protected void ProgramExit()
+        {
+            m_NotifyIcon.Visible = false;
+
+            // 메모리, 리소스 해제 및 메세지 처리 후 종료
+            g_program.ExitThread();
+
+            Dispose();
+
+            Application.Exit();
+        }
+
+        /// <summary>
+        /// Style Mode
+        /// </summary>
+        protected void StyleMode()
+        {
+            MetroThemeStyle metroThemeStyle = m_bStyle ? MetroThemeStyle.Dark : MetroThemeStyle.Light;
+
+            m_metroStyleManager.Theme = metroThemeStyle;
+
+            // Metro 오브젝트가 StyleManager로 변경이 안됨 (???)
+            // Label의 경우 Metro에 속해있지 않아서 직접 색깔을 변경해줘야 함
+            foreach (Control control in Controls)
+            {
+                if (typeof(MetroButton) == control.GetType())
+                {
+                    (control as MetroButton).Theme = metroThemeStyle;
+                }
+                else if (typeof(MetroCheckBox) == control.GetType())
+                {
+                    (control as MetroCheckBox).Theme = metroThemeStyle;
+                }
+                else if (typeof(MetroTrackBar) == control.GetType())
+                {
+                    (control as MetroTrackBar).Theme = metroThemeStyle;
+                }
+                else if (typeof(MetroRadioButton) == control.GetType())
+                {
+                    (control as MetroRadioButton).Theme = metroThemeStyle;
+                }
+                else if (typeof(MetroTextBox) == control.GetType())
+                {
+                    (control as MetroTextBox).Theme = metroThemeStyle;
+                }
+                // ContextMenuStrip 적용 -> StyleManager의 기본 값을 Default로 맞춰야 함
+                else if (typeof(MetroContextMenu) == control.GetType())
+                {
+                    (control as MetroContextMenu).Theme = metroThemeStyle;
+                }
+                else if (typeof(Label) == control.GetType())
+                {
+                    if (control.Name == label_TypeSingle.Name ||
+                        control.Name == label_TypeList.Name ||
+                        control.Name == label_StartOn.Name ||
+                        control.Name == label_VolumeOn.Name ||
+                        control.Name == label_VolumeError.Name ||
+                        control.Name == label_H264On.Name)
+                        continue;
+                    else
+                    {
+                        (control as Label).ForeColor = (metroThemeStyle == MetroThemeStyle.Light) ? Color.Black : Color.White;
+                    }
+                }
+            }
+
+            m_setting.bStyle = m_bStyle;
+            m_setting.SaveToFile(m_strSettingFile);
+
+            // 오브젝트가 자동으로 업데이트 되지 않음
+            Refresh();
+        }
+
+        /// <summary>
+        /// 이전 목록 재생
+        /// </summary>
+        protected void Prev()
+        {
+            int itmp = int.Parse(metroTextBox_Number.Text);
+
+            if (itmp > 1)
+            {
+                m_iPrevNext = 1;
+
+                Play();
+            }
+        }
+
+        /// <summary>
+        /// 다음 목록 재생
+        /// </summary>
+        protected void Next()
+        {
+            int itmp = int.Parse(metroTextBox_Number.Text);
+
+            if (itmp <= 999)
+            {
+                m_iPrevNext = 2;
+
+                Play();
+            }
+        }
+
+        /// <summary>
+        /// 출력 모니터 변경
+        /// </summary>
+        protected void MultiMonitor()
+        {
+            // 화면 전환
+            g_program.m_form2.Monitor++;
+            g_program.m_form3.Monitor++;
+
+            // 전환에 성공하였으면 설정을 저장하고 그렇지 않으면 정지
+            if (g_program.m_form2.Fixed && g_program.m_form3.Fixed)
+            {
+                m_setting.iMonitor = g_program.m_form2.Monitor;
+                m_setting.SaveToFile(m_strSettingFile);
+            }
+            else
+            {
+                // MessageBox.Show("출력 모니터를 변경할 수 없습니다.", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Form4.DialogCustom("Error!", "Can not Change Output Monitor!");
+
+                Stop();
+            }
+        }
+
+        /// <summary>
+        /// 시작 프로그램 등록
+        /// </summary>
+        protected void StartupPrograms(object objSender)
+        {
+            using (var varKey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
+            {
+                if (objSender.Equals(metroCheckBox_StartupPrograms))
+                {
+                    if (metroCheckBox_StartupPrograms.Checked)
+                    {
+                        varKey.SetValue(constStrApplication, Application.ExecutablePath.ToString());
+                        label_StartOn.Visible = true;
+                        label_StartOff.Visible = false;
+                        startupProgramToolStripMenuItem.Checked = true;
+
+                        // MessageBox.Show("등록 성공!", "시작 프로그램 등록", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        varKey.DeleteValue(constStrApplication, false);
+                        label_StartOn.Visible = false;
+                        label_StartOff.Visible = true;
+                        startupProgramToolStripMenuItem.Checked = false;
+
+                        // MessageBox.Show("해제 성공!", "시작 프로그램 해제", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                else
+                {
+                    if (startupProgramToolStripMenuItem.Checked)
+                    {
+                        varKey.SetValue(constStrApplication, Application.ExecutablePath.ToString());
+                        label_StartOn.Visible = true;
+                        label_StartOff.Visible = false;
+                        metroCheckBox_StartupPrograms.Checked = true;
+
+                        // MessageBox.Show("등록 성공!", "시작 프로그램 등록", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        varKey.DeleteValue(constStrApplication, false);
+                        label_StartOn.Visible = false;
+                        label_StartOff.Visible = true;
+                        metroCheckBox_StartupPrograms.Checked = false;
+
+                        // MessageBox.Show("해제 성공!", "시작 프로그램 해제", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+            }
+        }
+
+        // <summary>
+        /// 도움말
+        /// </summary>
+        protected void Help()
+        {
+            Form5 form5 = new Form5();
+            form5.ShowDialog();
+        }
+
+        /// <summary>
+        /// 데이터 파싱
+        /// </summary>
+        protected void Parsing()
+        {
+            try
+            {
+                // </a><div class="ytp-title-subtext">
+                // feature=player-title
+                if (m_strHtml != null)
+                {
+                    m_strNameOld = m_strNameNew;
+
+                    int iStart = m_strHtml.IndexOf("feature=player-title");
+                    iStart = m_strHtml.IndexOf(">", iStart);
+                    int iEnd = m_strHtml.IndexOf("<", iStart);
+
+                    m_strNameNew = m_strHtml.Substring(iStart + 1, iEnd - iStart - 1);
+
+                    label_VideoName.Text = m_strNameNew;
+
+                    if (m_strNameOld != m_strNameNew)
+                    {
+                        if (m_iPrevNext == 1)
+                        {
+                            m_iPlaylistNumber--;
+                        }
+                        else if (m_iPrevNext == 2)
+                        {
+                            m_iPlaylistNumber++;
+                        }
+                        else if (m_iPrevNext == 3)
+                        {
+                            m_iPlaylistNumber++;
+                        }
+                        else
+                        {
+
+                        }
+
+                        metroTextBox_Number.Text = m_iPlaylistNumber.ToString();
+
+                        m_iPrevNext = 3;
+
+                        m_setting.strNumber = metroTextBox_Number.Text;
+                        m_setting.SaveToFile(m_strSettingFile);
+
+                        // 단일 동영상의 경우 타이머를 계속 돌릴 필요가 없음
+                        if (m_bCheck)
+                        {
+                            m_timer.Stop();
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                
+            }
+        }
+
+        /// <summary>
+        /// 버전 체크
+        /// </summary>
+        protected async void VersionCheck()
+        {
+            using (WebClient webClient = new WebClient())
+            {
+                try
+                {
+                    string strtmp = await webClient.DownloadStringTaskAsync(@"https://raw.githubusercontent.com/sch6393/YoutubeWallpapers/master/YoutubeWallpapers/Properties/AssemblyInfo.cs");
+
+                    int iStart = strtmp.LastIndexOf("AssemblyVersion");
+
+                    iStart = strtmp.IndexOf('\"', iStart) + 1;
+                    int iEnd = strtmp.IndexOf('\"', iStart);
+
+                    string strVersion = strtmp.Substring(iStart, iEnd - iStart);
+
+                    if (Version.Parse(strVersion) > Version.Parse(Application.ProductVersion))
+                    {
+                        TransparentLabel();
+
+                        TransparentLabelTop transparentLabelTop = new TransparentLabelTop();
+                        transparentLabelTop.Height = 16;
+                        transparentLabelTop.Width = 151;
+                        transparentLabelTop.Top = 40;
+                        transparentLabelTop.Left = 400;
+                        transparentLabelTop.Text = "TOPTOPTOPTOPTOP";
+                        // transparentLabelTop.Font = new Font(m_fontFamily, 10, FontStyle.Bold);
+                        m_libFont.FontSet(transparentLabelTop, 10f, FontStyle.Bold);
+                        this.Controls.Add(transparentLabelTop);
+                        transparentLabelTop.Visible = true;
+                        transparentLabelTop.BringToFront();
+                        transparentLabelTop.Cursor = Cursors.Hand;
+                        transparentLabelTop.Click += TransparentLabelTop_Click;
+
+                        System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
+                        timer.Interval = 100;
+                        timer.Tick += Timer_Tick;
+                        timer.Enabled = true;
+                    }
+                }
+                catch (WebException)//webEx)
+                {
+                    Form4.DialogCustom("Caution!", "Unable to Check Version Without Internet Connection!");
+                }
+                catch (Exception)//ex)
+                {
+                    Form4.DialogCustom("Error!", "Failed to Version Check!");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 정주기 (100ms)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            if (m_bTransparent)
+            {
+                m_iTransparent += 20;
+            }
+            else
+            {
+                m_iTransparent -= 20;
+            }
+
+            if (m_iTransparent > 235)
+            {
+                m_bTransparent = false;
+            }
+            else if (m_iTransparent < 235 && m_iTransparent > 25)
+            {
+
+            }
+            else if (m_iTransparent < 25)
+            {
+                m_bTransparent = true;
+            }
+
+            TransparentLabel();
+        }
+
+        /// <summary>
+        /// New Version Available 클릭
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TransparentLabelTop_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start(@"https://github.com/sch6393/YoutubeWallpapers/releases");
+        }
+
+        /// <summary>
+        /// 투명 라벨 소멸 & 생성
+        /// </summary>
+        protected void TransparentLabel()
+        {
+            m_transparentLabel.Dispose();
+
+            m_transparentLabel = new TransparentLabel();
+            m_transparentLabel.Height = 16;
+            m_transparentLabel.Width = 151;
+            m_transparentLabel.Top = 40;
+            m_transparentLabel.Left = 400;
+            m_transparentLabel.Text = "New Version Available";
+            // m_transparentLabel.Font = new Font(m_fontFamily, 10, FontStyle.Bold);
+            m_libFont.FontSet(m_transparentLabel, 10f, FontStyle.Bold);
+            m_transparentLabel.ForeColor = Color.Crimson;
+            this.Controls.Add(m_transparentLabel);
+            m_transparentLabel.Visible = true;
+            // m_transparentLabel.BringToFront();
+            // m_transparentLabel.SendToBack();
+            // m_transparentLabel.Cursor = Cursors.Hand;
+            // m_transparentLabel.Click += M_transparentLabel_Click;
+        }
+
         #endregion
 
         #region NotifyIcon Event
@@ -721,6 +1217,35 @@ namespace YoutubeWallpapers
             ShowWindow();
         }
 
+        /// <summary>
+        /// 아이콘 메뉴
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void M_NotifyIcon_MouseClick(object sender, MouseEventArgs e)
+        {
+            // 임시 제한
+            //// 우클릭시
+            //if (e.Button == MouseButtons.Right)
+            //{
+            //    m_NotifyIcon.ContextMenuStrip = m_metroContextMenu;
+
+            //    MethodInfo methodInfo = typeof(NotifyIcon).GetMethod("ShowContextMenu", BindingFlags.Instance | BindingFlags.NonPublic);
+            //    methodInfo.Invoke(m_NotifyIcon, null);
+
+            //    //videoNameToolStripMenuItem.Text = label_VideoName.Text;
+            //    //volumeSetToolStripMenuItem.Text = metroTrackBar_Volume.Value.ToString();
+            //    //brightnessSetToolStripMenuItem.Text = (metroTrackBar_Brightness.Value * 2).ToString();
+
+            //    //volumeSetToolStripMenuItem.Theme = m_bStyle ? MetroThemeStyle.Dark : MetroThemeStyle.Light;
+
+            //    //volumeSetToolStripMenuItem.Value = Form2.iVolume;
+            //    //brightnessSetToolStripMenuItem.Value = m_iBrightness;
+
+            //    nameToolStripMenuItem.Text = m_strNameNew;
+            //}
+        }
+
         #endregion
 
         #region TrackBar Event
@@ -741,6 +1266,11 @@ namespace YoutubeWallpapers
             m_setting.SaveToFile(m_strSettingFile);
         }
 
+        /// <summary>
+        /// 볼륨 조절
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MetroTrackBar_Volume_ValueChanged(object sender, EventArgs e)
         {
             Form2.iVolume = metroTrackBar_Volume.Value;
@@ -760,27 +1290,11 @@ namespace YoutubeWallpapers
         /// <param name="e"></param>
         private void metroCheckBox_StartupPrograms_Click(object sender, EventArgs e)
         {
-            using (var varKey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
-            {
-                if (metroCheckBox_StartupPrograms.Checked)
-                {
-                    varKey.SetValue(constStrApplication, Application.ExecutablePath.ToString());
-                    label_StartOn.Visible = true;
-                    label_StartOff.Visible = false;
-                    // MessageBox.Show("등록 성공!", "시작 프로그램 등록", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else
-                {
-                    varKey.DeleteValue(constStrApplication, false);
-                    label_StartOn.Visible = false;
-                    label_StartOff.Visible = true;
-                    // MessageBox.Show("해제 성공!", "시작 프로그램 해제", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-            }
+            StartupPrograms(sender);
         }
 
         /// <summary>
-        /// 볼륨 설정 (CefSharp로 변경해서 미사용)
+        /// 볼륨 설정 (CefSharp로 변경해서 미사용) -> 다시 사용 (Form2 주석 참고)
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -788,17 +1302,42 @@ namespace YoutubeWallpapers
         {
             if (label_VolumeOn.Visible)
             {
-                // SetVolume(false);
+                SetVolume(false);
             }
             else if (label_VolumeOff.Visible)
             {
-                // SetVolume(true);
+                SetVolume(true);
             }
 
-            // Form4.DialogCustom("Volume Setup is Complete!", "Restart Program!");
+            Form4.DialogCustom("Volume Setup is Complete!", "Restart Program!");
 
             // 재시작을 해야 볼륨 설정이 적용
-            // Application.Restart();
+            Application.Restart();
+        }
+
+        /// <summary>
+        /// H264
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MetroCheckBox_H264_Click(object sender, EventArgs e)
+        {
+            if (metroCheckBox_H264.Checked)
+            {
+                m_bH264 = true;
+            }
+            else
+            {
+                m_bH264 = false;
+            }
+
+            m_setting.bH264 = m_bH264;
+            m_setting.SaveToFile(m_strSettingFile);
+
+            Form4.DialogCustom("H.264 Setup is Complete!", "Restart Program!");
+
+            // 재시작을 해야 안전하게 설정이 적용
+            Application.Restart();
         }
 
         #endregion
@@ -812,12 +1351,18 @@ namespace YoutubeWallpapers
         /// <param name="e"></param>
         private void metroButton_Help_Click(object sender, EventArgs e)
         {
-            Form5 form5 = new Form5();
-            form5.ShowDialog();
+            Help();
         }
 
+        /// <summary>
+        /// 시작
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void metroButton_Start_Click(object sender, EventArgs e)
         {
+            m_iPrevNext = 0;
+
             Play();
         }
 
@@ -838,16 +1383,7 @@ namespace YoutubeWallpapers
         /// <param name="e"></param>
         private void metroButton_Prev_Click(object sender, EventArgs e)
         {
-            int itmp = Convert.ToInt32(metroTextBox_Number.Text);
-
-            if (itmp > 0)
-            {
-                itmp--;
-            }
-
-            metroTextBox_Number.Text = itmp.ToString();
-
-            Play();
+            Prev();
         }
 
         /// <summary>
@@ -857,16 +1393,7 @@ namespace YoutubeWallpapers
         /// <param name="e"></param>
         private void metroButton_Next_Click(object sender, EventArgs e)
         {
-            int itmp = Convert.ToInt32(metroTextBox_Number.Text);
-
-            if (itmp < 999)
-            {
-                itmp++;
-            }
-
-            metroTextBox_Number.Text = itmp.ToString();
-
-            Play();
+            Next();
         }
 
         /// <summary>
@@ -886,23 +1413,31 @@ namespace YoutubeWallpapers
         /// <param name="e"></param>
         private void metroButton_Monitor_Click(object sender, EventArgs e)
         {
-            // 화면 전환
-            g_program.m_form2.Monitor++;
-            g_program.m_form3.Monitor++;
+            MultiMonitor();
+        }
 
-            // 전환에 성공하였으면 설정을 저장하고 그렇지 않으면 정지
-            if (g_program.m_form2.Fixed && g_program.m_form3.Fixed)
-            {
-                m_setting.iMonitor = g_program.m_form2.Monitor;
-                m_setting.SaveToFile(m_strSettingFile);
-            }
-            else
-            {
-                // MessageBox.Show("출력 모니터를 변경할 수 없습니다.", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Form4.DialogCustom("Error!", "Can not Change Output Monitor!");
+        /// <summary>
+        /// Light
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MetroButton_Light_Click(object sender, EventArgs e)
+        {
+            m_bStyle = false;
 
-                Stop();
-            }
+            StyleMode();
+        }
+
+        /// <summary>
+        /// Dark
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MetroButton_Dark_Click(object sender, EventArgs e)
+        {
+            m_bStyle = true;
+
+            StyleMode();
         }
 
         #endregion
@@ -961,5 +1496,260 @@ namespace YoutubeWallpapers
 
         #endregion
 
+        #region RadioButton Event
+
+        /// <summary>
+        /// Radio Button Click
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MetroRadioButton_Click(object sender, EventArgs e)
+        {
+            metroButton_Start_Click(null, e);
+        }
+
+        #endregion
+
+        #region ContextMenuStrip Event
+
+        /// <summary>
+        /// 재활성화
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void NameToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ShowWindow();
+        }
+
+        /// <summary>
+        /// Video Quality Auto
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AutoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            autoToolStripMenuItem.Checked = true;
+            video720ToolStripMenuItem.Checked = false;
+            video1080ToolStripMenuItem.Checked = false;
+            video1440ToolStripMenuItem.Checked = false;
+
+            metroRadioButton_Auto.Checked = true;
+            metroRadioButton_720.Checked = false;
+            metroRadioButton_1080.Checked = false;
+            metroRadioButton_1440.Checked = false;
+
+            MetroRadioButton_Click(null, e);
+        }
+
+        /// <summary>
+        /// Video Quality 720
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Video720ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            autoToolStripMenuItem.Checked = false;
+            video720ToolStripMenuItem.Checked = true;
+            video1080ToolStripMenuItem.Checked = false;
+            video1440ToolStripMenuItem.Checked = false;
+
+            metroRadioButton_Auto.Checked = false;
+            metroRadioButton_720.Checked = true;
+            metroRadioButton_1080.Checked = false;
+            metroRadioButton_1440.Checked = false;
+
+            MetroRadioButton_Click(null, e);
+        }
+
+        /// <summary>
+        /// Video Quality 1080
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Video1080ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            autoToolStripMenuItem.Checked = false;
+            video720ToolStripMenuItem.Checked = false;
+            video1080ToolStripMenuItem.Checked = true;
+            video1440ToolStripMenuItem.Checked = false;
+
+            metroRadioButton_Auto.Checked = false;
+            metroRadioButton_720.Checked = false;
+            metroRadioButton_1080.Checked = true;
+            metroRadioButton_1440.Checked = false;
+
+            MetroRadioButton_Click(null, e);
+        }
+
+        /// <summary>
+        /// Video Quality 1440
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Video1440ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            autoToolStripMenuItem.Checked = false;
+            video720ToolStripMenuItem.Checked = false;
+            video1080ToolStripMenuItem.Checked = false;
+            video1440ToolStripMenuItem.Checked = true;
+
+            metroRadioButton_Auto.Checked = false;
+            metroRadioButton_720.Checked = false;
+            metroRadioButton_1080.Checked = false;
+            metroRadioButton_1440.Checked = true;
+
+            MetroRadioButton_Click(null, e);
+        }
+
+        /// <summary>
+        /// 시작
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void StartToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Play();
+        }
+
+        /// <summary>
+        /// 정지
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void StopToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Stop();
+        }
+
+        /// <summary>
+        /// 이전 목록 재생
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PrevToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Prev();
+        }
+
+        /// <summary>
+        /// 다음 목록 재생
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void NextToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Next();
+        }
+
+        /// <summary>
+        /// 출력 모니터 변경
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void NextMonitorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MultiMonitor();
+        }
+
+        /// <summary>
+        /// 시작 프로그램 등록
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void StartupProgramToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            StartupPrograms(sender);
+        }
+
+        /// <summary>
+        /// 프로그램 종료
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ProgramExit();
+        }
+
+        #endregion
+
     }
+
+    #region Transparent Label Class
+
+    /// <summary>
+    /// 투명 라벨
+    /// </summary>
+    public class TransparentLabel : Control
+    {
+
+        public TransparentLabel()
+        {
+            TabStop = false;
+        }
+
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams createParams = base.CreateParams;
+                createParams.ExStyle |= 0x20;
+
+                return createParams;
+            }
+        }
+
+        protected override void OnPaintBackground(PaintEventArgs e)
+        {
+
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            using (SolidBrush solidBrush = new SolidBrush(Color.FromArgb(Form1.m_iTransparent, 220, 20, 60)))
+            {
+                e.Graphics.DrawString(Text, Font, solidBrush, -1, 0);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 투명 라벨 Top
+    /// </summary>
+    public class TransparentLabelTop : Control
+    {
+
+        public TransparentLabelTop()
+        {
+            TabStop = false;
+        }
+
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams createParams = base.CreateParams;
+                createParams.ExStyle |= 0x20;
+
+                return createParams;
+            }
+        }
+
+        protected override void OnPaintBackground(PaintEventArgs e)
+        {
+
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            using (SolidBrush solidBrush = new SolidBrush(Color.FromArgb(0, 0, 0, 0)))
+            {
+                e.Graphics.DrawString(Text, Font, solidBrush, -1, 0);
+            }
+        }
+    }
+
+    #endregion
+
 }

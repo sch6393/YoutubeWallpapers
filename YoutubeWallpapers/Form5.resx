@@ -123,8 +123,12 @@ Affected by Settings in Internet Explorer 11
 Play is not Possible If Set Private
 Play is not Possible If Certain Site &amp;&amp; Application Play Restrictions are Set
 Play is not Possible If Country Restriction is Set
-Are Exposed If Captions, Special Effects, Ads, etc. are Set</value>
+Are Exposed If Captions, Special Effects, Ads, etc. are Set
+Due to H.264 Codec, Streaming Video or Video using this Codec Must be Set to Work</value>
   </data>
+  <metadata name="m_metroStyleManager.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
