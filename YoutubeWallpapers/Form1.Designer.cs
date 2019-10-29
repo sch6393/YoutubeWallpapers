@@ -79,14 +79,9 @@ namespace YoutubeWallpapers
             this.m_metroContextMenu = new MetroFramework.Controls.MetroContextMenu(this.components);
             this.nameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.volumeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.volumeSetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.volumeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();            
             this.brightnessToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.brightnessSetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.addressToolStripMenuItem = new System.Windows.Forms.ToolStripTextBox();
-            this.playlistNumberToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.playlistNumberSetToolStripMenuItem = new System.Windows.Forms.ToolStripTextBox();
             this.videoQualityToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.autoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.video720ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -109,6 +104,10 @@ namespace YoutubeWallpapers
             this.label_H264Off = new System.Windows.Forms.Label();
             this.label_Name = new System.Windows.Forms.Label();
             this.label_VideoName = new System.Windows.Forms.Label();
+
+            this.volumeSetToolStripMenuItem = new ToolStripTrackbarItem();
+            this.brightnessSetToolStripMenuItem = new ToolStripTrackbarItem();
+
             this.m_metroContextMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.m_metroStyleManager)).BeginInit();
             this.SuspendLayout();
@@ -128,6 +127,7 @@ namespace YoutubeWallpapers
             this.metroTrackBar_Brightness.TabIndex = 10;
             this.metroTrackBar_Brightness.Theme = MetroFramework.MetroThemeStyle.Dark;
             this.metroTrackBar_Brightness.ValueChanged += new System.EventHandler(this.metroTrackBar_Brightness_ValueChanged);
+            this.metroTrackBar_Brightness.MouseEnter += new System.EventHandler(this.metroTrackBar_Brightness_MouseEnter);
             // 
             // metroButton_Help
             // 
@@ -604,6 +604,7 @@ namespace YoutubeWallpapers
             this.metroTrackBar_Volume.Value = 0;
             this.metroTrackBar_Volume.Visible = false;
             this.metroTrackBar_Volume.ValueChanged += new System.EventHandler(this.MetroTrackBar_Volume_ValueChanged);
+            this.metroTrackBar_Volume.MouseEnter += new System.EventHandler(this.metroTrackBar_Volume_MouseEnter);
             // 
             // metroButton_Light
             // 
@@ -653,8 +654,6 @@ namespace YoutubeWallpapers
             this.volumeToolStripMenuItem,
             this.brightnessToolStripMenuItem,
             this.toolStripSeparator2,
-            this.addressToolStripMenuItem,
-            this.playlistNumberToolStripMenuItem,
             this.videoQualityToolStripMenuItem,
             this.toolStripSeparator4,
             this.startToolStripMenuItem,
@@ -668,71 +667,40 @@ namespace YoutubeWallpapers
             this.m_metroContextMenu.Name = "m_metroContextMenu";
             this.m_metroContextMenu.ShowCheckMargin = true;
             this.m_metroContextMenu.ShowImageMargin = false;
-            this.m_metroContextMenu.Size = new System.Drawing.Size(241, 317);
+            this.m_metroContextMenu.Size = new System.Drawing.Size(164, 270);
             // 
             // nameToolStripMenuItem
             // 
             this.nameToolStripMenuItem.Name = "nameToolStripMenuItem";
-            this.nameToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
+            this.nameToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.nameToolStripMenuItem.Text = "Name";
             this.nameToolStripMenuItem.Click += new System.EventHandler(this.NameToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(237, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(160, 6);
             // 
             // volumeToolStripMenuItem
             // 
             this.volumeToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.volumeSetToolStripMenuItem});
             this.volumeToolStripMenuItem.Name = "volumeToolStripMenuItem";
-            this.volumeToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
+            this.volumeToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.volumeToolStripMenuItem.Text = "Volume";
-            // 
-            // volumeSetToolStripMenuItem
-            // 
-            this.volumeSetToolStripMenuItem.Name = "volumeSetToolStripMenuItem";
-            this.volumeSetToolStripMenuItem.Size = new System.Drawing.Size(67, 22);
             // 
             // brightnessToolStripMenuItem
             // 
             this.brightnessToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.brightnessSetToolStripMenuItem});
             this.brightnessToolStripMenuItem.Name = "brightnessToolStripMenuItem";
-            this.brightnessToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
+            this.brightnessToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.brightnessToolStripMenuItem.Text = "Brightness";
-            // 
-            // brightnessSetToolStripMenuItem
-            // 
-            this.brightnessSetToolStripMenuItem.Name = "brightnessSetToolStripMenuItem";
-            this.brightnessSetToolStripMenuItem.Size = new System.Drawing.Size(67, 22);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(237, 6);
-            // 
-            // addressToolStripMenuItem
-            // 
-            this.addressToolStripMenuItem.Font = new System.Drawing.Font("맑은 고딕", 9F);
-            this.addressToolStripMenuItem.Name = "addressToolStripMenuItem";
-            this.addressToolStripMenuItem.Size = new System.Drawing.Size(180, 23);
-            this.addressToolStripMenuItem.Text = "Address";
-            // 
-            // playlistNumberToolStripMenuItem
-            // 
-            this.playlistNumberToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.playlistNumberSetToolStripMenuItem});
-            this.playlistNumberToolStripMenuItem.Name = "playlistNumberToolStripMenuItem";
-            this.playlistNumberToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
-            this.playlistNumberToolStripMenuItem.Text = "Playlist Number";
-            // 
-            // playlistNumberSetToolStripMenuItem
-            // 
-            this.playlistNumberSetToolStripMenuItem.Font = new System.Drawing.Font("맑은 고딕", 9F);
-            this.playlistNumberSetToolStripMenuItem.Name = "playlistNumberSetToolStripMenuItem";
-            this.playlistNumberSetToolStripMenuItem.Size = new System.Drawing.Size(180, 23);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(160, 6);
             // 
             // videoQualityToolStripMenuItem
             // 
@@ -742,7 +710,7 @@ namespace YoutubeWallpapers
             this.video1080ToolStripMenuItem,
             this.video1440ToolStripMenuItem});
             this.videoQualityToolStripMenuItem.Name = "videoQualityToolStripMenuItem";
-            this.videoQualityToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
+            this.videoQualityToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.videoQualityToolStripMenuItem.Text = "Video Quality";
             // 
             // autoToolStripMenuItem
@@ -780,40 +748,40 @@ namespace YoutubeWallpapers
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(237, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(160, 6);
             // 
             // startToolStripMenuItem
             // 
             this.startToolStripMenuItem.Name = "startToolStripMenuItem";
-            this.startToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
+            this.startToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.startToolStripMenuItem.Text = "Start";
             this.startToolStripMenuItem.Click += new System.EventHandler(this.StartToolStripMenuItem_Click);
             // 
             // stopToolStripMenuItem
             // 
             this.stopToolStripMenuItem.Name = "stopToolStripMenuItem";
-            this.stopToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
+            this.stopToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.stopToolStripMenuItem.Text = "Stop";
             this.stopToolStripMenuItem.Click += new System.EventHandler(this.StopToolStripMenuItem_Click);
             // 
             // prevToolStripMenuItem
             // 
             this.prevToolStripMenuItem.Name = "prevToolStripMenuItem";
-            this.prevToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
+            this.prevToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.prevToolStripMenuItem.Text = "Prev";
             this.prevToolStripMenuItem.Click += new System.EventHandler(this.PrevToolStripMenuItem_Click);
             // 
             // nextToolStripMenuItem
             // 
             this.nextToolStripMenuItem.Name = "nextToolStripMenuItem";
-            this.nextToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
+            this.nextToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.nextToolStripMenuItem.Text = "Next";
             this.nextToolStripMenuItem.Click += new System.EventHandler(this.NextToolStripMenuItem_Click);
             // 
             // nextMonitorToolStripMenuItem
             // 
             this.nextMonitorToolStripMenuItem.Name = "nextMonitorToolStripMenuItem";
-            this.nextMonitorToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
+            this.nextMonitorToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.nextMonitorToolStripMenuItem.Text = "Next Monitor";
             this.nextMonitorToolStripMenuItem.Click += new System.EventHandler(this.NextMonitorToolStripMenuItem_Click);
             // 
@@ -821,19 +789,19 @@ namespace YoutubeWallpapers
             // 
             this.startupProgramToolStripMenuItem.CheckOnClick = true;
             this.startupProgramToolStripMenuItem.Name = "startupProgramToolStripMenuItem";
-            this.startupProgramToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
+            this.startupProgramToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.startupProgramToolStripMenuItem.Text = "Startup Program";
             this.startupProgramToolStripMenuItem.Click += new System.EventHandler(this.StartupProgramToolStripMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(237, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(160, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(240, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.ExitToolStripMenuItem_Click);
             // 
@@ -921,6 +889,29 @@ namespace YoutubeWallpapers
             this.label_VideoName.Name = "label_VideoName";
             this.label_VideoName.Size = new System.Drawing.Size(0, 15);
             this.label_VideoName.TabIndex = 0;
+
+
+            // 
+            // toolStripMenuItem_VolumeTrackBar
+            // 
+            this.volumeSetToolStripMenuItem.Name = "volumeSetToolStripMenuItem";
+            this.volumeSetToolStripMenuItem.Size = new System.Drawing.Size(100, 15);
+            this.volumeSetToolStripMenuItem.ValueChanged += VolumeSetToolStripMenuItem_ValueChanged;
+            this.volumeSetToolStripMenuItem.MouseEnter += VolumeSetToolStripMenuItem_MouseEnter;
+            this.volumeSetToolStripMenuItem.Minimum = 0;
+            this.volumeSetToolStripMenuItem.Maximum = 100;
+            // 
+            // toolStripMenuItem_BrightnessTrackBar
+            // 
+            this.brightnessSetToolStripMenuItem.Name = "brightnessSetToolStripMenuItem";
+            this.brightnessSetToolStripMenuItem.Size = new System.Drawing.Size(100, 15);
+            this.brightnessSetToolStripMenuItem.ValueChanged += BrightnessSetToolStripMenuItem_ValueChanged;
+            this.brightnessSetToolStripMenuItem.MouseEnter += BrightnessSetToolStripMenuItem_MouseEnter;
+            this.brightnessSetToolStripMenuItem.Minimum = 5;
+            this.brightnessSetToolStripMenuItem.Maximum = 50;
+            this.brightnessSetToolStripMenuItem.MouseWheelBarPartitions = 18;
+
+
             // 
             // Form1
             // 
@@ -979,35 +970,56 @@ namespace YoutubeWallpapers
             this.Load += new System.EventHandler(this.Form1_Load);
             this.Shown += new System.EventHandler(this.Form1_Shown);
             this.m_metroContextMenu.ResumeLayout(false);
-            this.m_metroContextMenu.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.m_metroStyleManager)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
-        /// <summary>
-        /// 볼륨 조절
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        
+
+        private void BrightnessSetToolStripMenuItem_ValueChanged(object sender, EventArgs e)
+        {
+            if (m_bTrackBarBrightness)
+            {
+                m_iBrightness = brightnessSetToolStripMenuItem.Value;
+                metroTrackBar_Brightness.Value = m_iBrightness;
+
+                SetBrightness(m_iBrightness);
+
+                m_setting.iBrightness = m_iBrightness;
+                m_setting.SaveToFile(m_strSettingFile);
+            }
+            else
+            {
+
+            }
+        }
+
+        private void BrightnessSetToolStripMenuItem_MouseEnter(object sender, EventArgs e)
+        {
+            m_bTrackBarBrightness = true;
+        }
+
         private void VolumeSetToolStripMenuItem_ValueChanged(object sender, EventArgs e)
         {
-            // Form2.iVolume = volumeSetToolStripMenuItem.Value;
-            metroTrackBar_Volume.Value = Form2.iVolume;
+            if (m_bTrackBarVolume)
+            {
+                Form2.iVolume = volumeSetToolStripMenuItem.Value;
+                metroTrackBar_Volume.Value = Form2.iVolume;
 
-            m_setting.iVolume = metroTrackBar_Volume.Value;
-            m_setting.SaveToFile(m_strSettingFile);
+                m_setting.iVolume = Form2.iVolume;
+                m_setting.SaveToFile(m_strSettingFile);
+            }
+            else
+            {
 
-            //// 
-            //// volumeSetToolStripMenuItem
-            //// 
-            //this.volumeSetToolStripMenuItem.Name = "volumeSetToolStripMenuItem";
-            //this.volumeSetToolStripMenuItem.Size = new System.Drawing.Size(100, 15);
-            //this.volumeSetToolStripMenuItem.Text = "volumeSet";
-            //this.volumeSetToolStripMenuItem.ValueChanged += VolumeSetToolStripMenuItem_ValueChanged; ;
-            //this.volumeSetToolStripMenuItem.Minimum = 0;
-            //this.volumeSetToolStripMenuItem.Maximum = 100;
+            }
+        }
+
+        private void VolumeSetToolStripMenuItem_MouseEnter(object sender, EventArgs e)
+        {
+            m_bTrackBarVolume = true;
         }
 
         #endregion
@@ -1066,16 +1078,11 @@ namespace YoutubeWallpapers
         private ToolStripMenuItem startupProgramToolStripMenuItem;
         private ToolStripSeparator toolStripSeparator3;
         private ToolStripMenuItem exitToolStripMenuItem;
-        private ToolStripMenuItem playlistNumberToolStripMenuItem;
         private ToolStripMenuItem videoQualityToolStripMenuItem;
         private ToolStripMenuItem autoToolStripMenuItem;
         private ToolStripMenuItem video720ToolStripMenuItem;
         private ToolStripMenuItem video1080ToolStripMenuItem;
         private ToolStripMenuItem video1440ToolStripMenuItem;
-        private ToolStripMenuItem volumeSetToolStripMenuItem;
-        private ToolStripMenuItem brightnessSetToolStripMenuItem;
-        private ToolStripTextBox addressToolStripMenuItem;
-        private ToolStripTextBox playlistNumberSetToolStripMenuItem;
         public MetroTextBox metroTextBox_Number;
         private Timer m_timer;
         private Label label_H264;
@@ -1086,7 +1093,8 @@ namespace YoutubeWallpapers
         private Label label_VideoName;
 
         // ConvtextMenuStrip TrackBar
-        // private ToolStripTrackbarItem volumeSetToolStripMenuItem;
+        private ToolStripTrackbarItem volumeSetToolStripMenuItem;
+        private ToolStripTrackbarItem brightnessSetToolStripMenuItem;
     }
 
     #region Custom ToolStripItem Class
@@ -1218,74 +1226,6 @@ namespace YoutubeWallpapers
 
         public event EventHandler ValueChanged;
 
-    }
-
-    /// <summary>
-    /// ContextMenuStrip에 TextBox를 넣기 위함
-    /// </summary>
-    [DesignerCategory("code")]
-    [ToolStripItemDesignerAvailability(ToolStripItemDesignerAvailability.ContextMenuStrip | ToolStripItemDesignerAvailability.MenuStrip)]
-    public class ToolStripTextBoxItem : ToolStripControlHost
-    {
-        public ToolStripTextBoxItem() : base(CreateControlInstance())
-        {
-            this.Size = Control.Size;
-        }
-
-        public MetroTextBox MetroTextBox
-        {
-            get
-            {
-                return Control as MetroTextBox;
-            }
-        }
-
-        private static Control CreateControlInstance()
-        {
-            MetroTextBox metroTextBox = new MetroTextBox();
-            metroTextBox.AutoSize = false;
-
-            return metroTextBox;
-        }
-
-        public MetroThemeStyle Theme
-        {
-            get
-            {
-                return MetroTextBox.Theme;
-            }
-            set
-            {
-                MetroTextBox.Theme = value;
-            }
-        }
-
-        //public MetroStyleManager StyleManager
-        //{
-        //    get
-        //    {
-        //        return MetroTextBox.StyleManager;
-        //    }
-        //    set
-        //    {
-        //        MetroTextBox.StyleManager = value;
-        //    }
-        //}
-
-        /// <summary>
-        /// 재정의가 아니므로 new 추가
-        /// </summary>
-        public new string Text
-        {
-            get
-            {
-                return MetroTextBox.Text;
-            }
-            set
-            {
-                MetroTextBox.Text = value;
-            }
-        }
     }
 
     #endregion

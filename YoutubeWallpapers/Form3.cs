@@ -19,10 +19,6 @@ namespace YoutubeWallpapers
         /// </summary>
         public Program g_program;
 
-        /// <summary>
-        /// Background 변수들
-        /// </summary>
-        private bool m_bFixed = false;
         private int m_iMonitor = 0;
 
         public Form3()
@@ -49,14 +45,14 @@ namespace YoutubeWallpapers
 
         protected bool Background()
         {
-            m_bFixed = Wallpaper.Background(this.Handle);
+            Fixed = Wallpaper.Background(this.Handle);
 
-            if (m_bFixed)
+            if (Fixed)
             {
                 Utility.FillMonitor(this, MonitorInfo);
             }
 
-            return m_bFixed;
+            return Fixed;
         }
 
         public WinApi.MONITORINFO MonitorInfo
@@ -74,13 +70,7 @@ namespace YoutubeWallpapers
             }
         }
 
-        public bool Fixed
-        {
-            get
-            {
-                return m_bFixed;
-            }
-        }
+        public bool Fixed { get; private set; } = false;
 
         public int Monitor
         {

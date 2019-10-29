@@ -10,6 +10,7 @@ using System.Windows.Forms;
 
 using System.IO;
 using System.Net;
+using System.Reflection;
 using System.Security.Principal;
 using System.Threading;
 using Microsoft.Win32;
@@ -115,6 +116,13 @@ namespace YoutubeWallpapers
         /// </summary>
         protected bool m_bTransparent = false;
         public static int m_iTransparent = 255;
+
+
+        /// <summary>
+        /// true : toolStripMenuItem, false : metroTrackBar
+        /// </summary>
+        public bool m_bTrackBarVolume = false;
+        public bool m_bTrackBarBrightness = false;
 
         /// <summary>
         /// 생성자
@@ -420,7 +428,15 @@ namespace YoutubeWallpapers
             metroTextBox_Address.Text = m_strAddress;
 
             metroTextBox_Number.Text = m_setting.strNumber;
-            m_iPlaylistNumber = int.Parse(m_setting.strNumber);
+
+            if (metroTextBox_Number.Text == "" || metroTextBox_Number.Text == string.Empty)
+            {
+                m_iPlaylistNumber = 1;
+            }
+            else
+            {
+                m_iPlaylistNumber = int.Parse(m_setting.strNumber);
+            }
 
             m_iBrightness = m_setting.iBrightness;
             metroTrackBar_Brightness.Value = m_setting.iBrightness;
@@ -505,7 +521,16 @@ namespace YoutubeWallpapers
                 if (!string.IsNullOrEmpty(strNum))
                 {
                     int itmp = Convert.ToInt32(strNum);
-                    m_iPlaylistNumber = itmp;
+
+                    if (itmp == 0)
+                    {
+                        m_iPlaylistNumber = 1;
+                        metroTextBox_Number.Text = "1";
+                    }
+                    else
+                    {
+                        m_iPlaylistNumber = itmp;
+                    }
 
                     stringBuilder.Append("&index=");
 
@@ -523,6 +548,11 @@ namespace YoutubeWallpapers
                     }
 
                     stringBuilder.Append(itmp - 1);
+                }
+                else
+                {
+                    m_iPlaylistNumber = 1;
+                    metroTextBox_Number.Text = "1";
                 }
             }
             // 단일
@@ -644,6 +674,8 @@ namespace YoutubeWallpapers
         /// </summary>
         protected void Stop()
         {
+            label_VideoName.Text = "";
+
             m_timer.Stop();
 
             g_program.m_form2.Stop();
@@ -1224,26 +1256,30 @@ namespace YoutubeWallpapers
         /// <param name="e"></param>
         private void M_NotifyIcon_MouseClick(object sender, MouseEventArgs e)
         {
-            // 임시 제한
-            //// 우클릭시
-            //if (e.Button == MouseButtons.Right)
-            //{
-            //    m_NotifyIcon.ContextMenuStrip = m_metroContextMenu;
+            // 우클릭시
+            if (e.Button == MouseButtons.Right)
+            {
+                m_NotifyIcon.ContextMenuStrip = m_metroContextMenu;
 
-            //    MethodInfo methodInfo = typeof(NotifyIcon).GetMethod("ShowContextMenu", BindingFlags.Instance | BindingFlags.NonPublic);
-            //    methodInfo.Invoke(m_NotifyIcon, null);
+                MethodInfo methodInfo = typeof(NotifyIcon).GetMethod("ShowContextMenu", BindingFlags.Instance | BindingFlags.NonPublic);
+                methodInfo.Invoke(m_NotifyIcon, null);
 
-            //    //videoNameToolStripMenuItem.Text = label_VideoName.Text;
-            //    //volumeSetToolStripMenuItem.Text = metroTrackBar_Volume.Value.ToString();
-            //    //brightnessSetToolStripMenuItem.Text = (metroTrackBar_Brightness.Value * 2).ToString();
+                nameToolStripMenuItem.Text = m_strNameNew;
 
-            //    //volumeSetToolStripMenuItem.Theme = m_bStyle ? MetroThemeStyle.Dark : MetroThemeStyle.Light;
+                if (m_bStyle)
+                {
+                    volumeSetToolStripMenuItem.Theme = MetroThemeStyle.Dark;
+                    brightnessSetToolStripMenuItem.Theme = MetroThemeStyle.Dark;
+                }
+                else
+                {
+                    volumeSetToolStripMenuItem.Theme = MetroThemeStyle.Light;
+                    brightnessSetToolStripMenuItem.Theme = MetroThemeStyle.Light;
+                }
 
-            //    //volumeSetToolStripMenuItem.Value = Form2.iVolume;
-            //    //brightnessSetToolStripMenuItem.Value = m_iBrightness;
-
-            //    nameToolStripMenuItem.Text = m_strNameNew;
-            //}
+                volumeSetToolStripMenuItem.Value = Form2.iVolume;
+                brightnessSetToolStripMenuItem.Value = m_iBrightness;
+            }
         }
 
         #endregion
@@ -1257,13 +1293,29 @@ namespace YoutubeWallpapers
         /// <param name="e"></param>
         private void metroTrackBar_Brightness_ValueChanged(object sender, EventArgs e)
         {
-            m_iBrightness = metroTrackBar_Brightness.Value;
-            // metroProgressBar_Brightness.Value = Convert.ToInt32(metroTrackBar_Brightness.Value * 0.98) + 2;
+            if (m_bTrackBarBrightness)
+            {
 
-            SetBrightness(m_iBrightness);
+            }
+            else
+            {
+                m_iBrightness = metroTrackBar_Brightness.Value;
 
-            m_setting.iBrightness = metroTrackBar_Brightness.Value;
-            m_setting.SaveToFile(m_strSettingFile);
+                SetBrightness(m_iBrightness);
+
+                m_setting.iBrightness = metroTrackBar_Brightness.Value;
+                m_setting.SaveToFile(m_strSettingFile);
+            }
+        }
+
+        /// <summary>
+        /// Mouse Enter
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void metroTrackBar_Brightness_MouseEnter(object sender, EventArgs e)
+        {
+            m_bTrackBarBrightness = false;
         }
 
         /// <summary>
@@ -1273,10 +1325,28 @@ namespace YoutubeWallpapers
         /// <param name="e"></param>
         private void MetroTrackBar_Volume_ValueChanged(object sender, EventArgs e)
         {
-            Form2.iVolume = metroTrackBar_Volume.Value;
+            if (m_bTrackBarVolume)
+            {
 
-            m_setting.iVolume = metroTrackBar_Volume.Value;
-            m_setting.SaveToFile(m_strSettingFile);
+            }
+            else
+            {
+                Form2.iVolume = metroTrackBar_Volume.Value;
+                volumeSetToolStripMenuItem.Value = Form2.iVolume;
+
+                m_setting.iVolume = metroTrackBar_Volume.Value;
+                m_setting.SaveToFile(m_strSettingFile);
+            }
+        }
+
+        /// <summary>
+        /// Mouse Enter
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void metroTrackBar_Volume_MouseEnter(object sender, EventArgs e)
+        {
+            m_bTrackBarVolume = false;
         }
 
         #endregion
@@ -1683,7 +1753,6 @@ namespace YoutubeWallpapers
     /// </summary>
     public class TransparentLabel : Control
     {
-
         public TransparentLabel()
         {
             TabStop = false;
@@ -1719,7 +1788,6 @@ namespace YoutubeWallpapers
     /// </summary>
     public class TransparentLabelTop : Control
     {
-
         public TransparentLabelTop()
         {
             TabStop = false;
